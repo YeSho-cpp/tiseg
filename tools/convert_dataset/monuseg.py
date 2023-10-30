@@ -13,19 +13,29 @@ from PIL import Image
 
 # dataset split
 split_dict = {
-    'train': [
-        'TCGA-A7-A13E-01Z-00-DX1', 'TCGA-A7-A13F-01Z-00-DX1', 'TCGA-AR-A1AK-01Z-00-DX1', 'TCGA-B0-5711-01Z-00-DX1',
-        'TCGA-HE-7128-01Z-00-DX1', 'TCGA-HE-7129-01Z-00-DX1', 'TCGA-18-5592-01Z-00-DX1', 'TCGA-38-6178-01Z-00-DX1',
-        'TCGA-49-4488-01Z-00-DX1', 'TCGA-G9-6336-01Z-00-DX1', 'TCGA-G9-6348-01Z-00-DX1', 'TCGA-G9-6356-01Z-00-DX1'
-    ],
+'train': [
+    'TCGA-18-5592-01Z-00-DX1', 'TCGA-21-5784-01Z-00-DX1', 'TCGA-21-5786-01Z-00-DX1', 'TCGA-38-6178-01Z-00-DX1',
+    'TCGA-49-4488-01Z-00-DX1', 'TCGA-A7-A13E-01Z-00-DX1', 'TCGA-A7-A13F-01Z-00-DX1', 'TCGA-AR-A1AK-01Z-00-DX1',
+    'TCGA-AY-A8YK-01A-01-TS1', 'TCGA-B0-5698-01Z-00-DX1', 'TCGA-B0-5710-01Z-00-DX1', 'TCGA-B0-5711-01Z-00-DX1',
+    'TCGA-BC-A217-01Z-00-DX1', 'TCGA-CH-5767-01Z-00-DX1', 'TCGA-DK-A2I6-01A-01-TS1', 'TCGA-E2-A14V-01Z-00-DX1',
+    'TCGA-E2-A1B5-01Z-00-DX1', 'TCGA-F9-A8NY-01Z-00-DX1', 'TCGA-FG-A87N-01Z-00-DX1', 'TCGA-G2-A2EK-01A-02-TSB',
+    'TCGA-G9-6336-01Z-00-DX1', 'TCGA-G9-6348-01Z-00-DX1', 'TCGA-G9-6356-01Z-00-DX1', 'TCGA-G9-6362-01Z-00-DX1',
+    'TCGA-HE-7128-01Z-00-DX1', 'TCGA-HE-7129-01Z-00-DX1', 'TCGA-KB-A93J-01A-01-TS1', 'TCGA-MH-A561-01Z-00-DX1',
+    'TCGA-NH-A8F7-01A-01-TS1', 'TCGA-RD-A8N9-01A-01-TS1', 'TCGA-UZ-A9PJ-01Z-00-DX1', 'TCGA-UZ-A9PN-01Z-00-DX1',
+    'TCGA-XS-A8TJ-01Z-00-DX1'
+],
+
     'val': ['TCGA-AR-A1AS-01Z-00-DX1', 'TCGA-HE-7130-01Z-00-DX1', 'TCGA-50-5931-01Z-00-DX1', 'TCGA-G9-6363-01Z-00-DX1'],
     'test1': [
-        'TCGA-E2-A1B5-01Z-00-DX1', 'TCGA-E2-A14V-01Z-00-DX1', 'TCGA-B0-5710-01Z-00-DX1', 'TCGA-B0-5698-01Z-00-DX1',
-        'TCGA-21-5784-01Z-00-DX1', 'TCGA-21-5786-01Z-00-DX1', 'TCGA-CH-5767-01Z-00-DX1', 'TCGA-G9-6362-01Z-00-DX1'
+        'TCGA-2Z-A9J9-01A-01-TS1','TCGA-44-2665-01B-06-BS6',
+        'TCGA-69-7764-01A-01-TS1','TCGA-A6-6782-01A-01-BS1',
+        'TCGA-AC-A2FO-01A-01-TS1','TCGA-AO-A0J2-01A-01-BSA',
+        'TCGA-CU-A0YN-01A-02-BSB','TCGA-EJ-A46H-01A-03-TSC',
     ],
     'test2': [
-        'TCGA-DK-A2I6-01A-01-TS1', 'TCGA-G2-A2EK-01A-02-TSB', 'TCGA-AY-A8YK-01A-01-TS1', 'TCGA-NH-A8F7-01A-01-TS1',
-        'TCGA-KB-A93J-01A-01-TS1', 'TCGA-RD-A8N9-01A-01-TS1'
+        'TCGA-FG-A4MU-01B-01-TS1','TCGA-GL-6846-01A-01-BS1',
+        'TCGA-HC-7209-01A-01-TS1','TCGA-HT-8564-01Z-00-DX1',
+        'TCGA-IZ-8196-01A-01-BS1','TCGA-ZF-A9R5-01A-01-TS1'
     ]
 }
 
@@ -45,7 +55,8 @@ def extract_contours(path):
     for region in regions:
         points = []
         for point in region.xpath('Vertices/Vertex'):
-            points.append([math.floor(float(point.attrib['X'])), math.floor(float(point.attrib['Y']))])
+            points.append([math.floor(float(point.attrib['X'])),
+                          math.floor(float(point.attrib['Y']))])
 
         contours.append(np.array(points, dtype=np.int32))
     return contours
@@ -72,7 +83,8 @@ def convert_contour_to_instance(contours, height, width):
         # Compress value to avoid overflow
         red = 1 + index_value / 10
         red = float(f'{red:.2f}')
-        mask = cv2.drawContours(mask, [contour], 0, (red, green, blue), thickness=cv2.FILLED)
+        mask = cv2.drawContours(
+            mask, [contour], 0, (red, green, blue), thickness=cv2.FILLED)
         index_value = index_value + 1
 
     return mask
@@ -97,7 +109,8 @@ def colorize_seg_map(seg_map):
             continue
         colorful_seg_map[seg_map == id_] = random.random()
 
-    colorful_seg_map = cv2.applyColorMap((colorful_seg_map * 255).astype(np.uint8), cv2.COLORMAP_RAINBOW)
+    colorful_seg_map = cv2.applyColorMap(
+        (colorful_seg_map * 255).astype(np.uint8), cv2.COLORMAP_RAINBOW)
     colorful_seg_map[seg_map == 0, :] = (0, 0, 0)
     colorful_seg_map = cv2.cvtColor(colorful_seg_map, cv2.COLOR_BGR2RGB)
 
@@ -115,10 +128,12 @@ def crop_patches(image, w_size, s_size):
 
     if len(image.shape) == 2:
         image = image[:, :, None]
-        image = np.lib.pad(image, ((pad1, pad2), (pad1, pad2), (0, 0)), 'reflect')
+        image = np.lib.pad(
+            image, ((pad1, pad2), (pad1, pad2), (0, 0)), 'reflect')
         image = image[:, :, 0]
     elif len(image.shape) == 3:
-        image = np.lib.pad(image, ((pad1, pad2), (pad1, pad2), (0, 0)), 'reflect')
+        image = np.lib.pad(
+            image, ((pad1, pad2), (pad1, pad2), (0, 0)), 'reflect')
 
     pad_h, pad_w = image.shape[:2]
     h_last_step = math.floor((pad_h - w_size) / s_size)
@@ -170,7 +185,8 @@ def parse_single_item(item, raw_image_folder, raw_label_folder, new_path, w_size
         instance_patches = crop_patches(instance_label, w_size, s_size)
         semantic_patches = crop_patches(semantic_label, w_size, s_size)
 
-        assert len(image_patches) == len(instance_patches) == len(semantic_patches)
+        assert len(image_patches) == len(
+            instance_patches) == len(semantic_patches)
 
         item_len = len(image_patches)
         # record patch item name
@@ -193,12 +209,14 @@ def parse_single_item(item, raw_image_folder, raw_label_folder, new_path, w_size
         # save instance level label
         np.save(osp.join(new_path, sub_item + '_inst.npy'), patch[1])
         # save colorized instance level label
-        pillow_save(osp.join(new_path, sub_item + '_inst_color.png'), colorize_seg_map(patch[1]))
+        pillow_save(osp.join(new_path, sub_item + '_inst_color.png'),
+                    colorize_seg_map(patch[1]))
         # save semantic level label
         palette = np.zeros((2, 3), dtype=np.uint8)
         palette[0, :] = (0, 0, 0)
         palette[1, :] = (255, 255, 2)
-        pillow_save(osp.join(new_path, sub_item + '_sem.png'), patch[2], palette=palette)
+        pillow_save(osp.join(new_path, sub_item + '_sem.png'),
+                    patch[2], palette=palette)
 
     return {item: sub_item_list}
 
@@ -233,7 +251,8 @@ def parse_args():
         type=int,
         default=0,
         help='the window size of step crop in dataset convertion operation.')
-    parser.add_argument('-s', '--step-size', type=int, default=0, help='patch croping step.')
+    parser.add_argument('-s', '--step-size', type=int,
+                        default=0, help='patch croping step.')
 
     return parser.parse_args()
 
@@ -246,45 +265,57 @@ def main():
     w_size = args.window_size
     s_size = args.step_size
 
-    assert w_size > s_size
 
     assert total_split in ['official', 'only-train_t16', 'only-train_t12_v4']
 
-    for split, name in [('train', 'MoNuSeg 2018 Training Data'), ('test', 'MoNuSegTestData')]:
-        raw_root = osp.join(root_path, 'monuseg', name)
+    for split, name in [('train', 'MoNuSeg 2018 Training Data'),('val', 'MoNuSeg 2018 Training Data'),('test', 'MoNuSegTestData')]:
+        raw_root = osp.join(root_path, 'MoNuSeg', name)
 
         if split == 'train':
             raw_img_folder = osp.join(raw_root, 'Tissue Images')
             raw_lbl_folder = osp.join(raw_root, 'Annotations')
             new_root = osp.join(root_path, split, f'w{w_size}_s{s_size}')
 
-            item_list = [x.rstrip('.tif') for x in os.listdir(raw_img_folder) if '.tif' in x]
+            item_list = split_dict['train']
 
-            convert_cohort(raw_img_folder, raw_lbl_folder, new_root, item_list, w_size, s_size)
+            convert_cohort(raw_img_folder, raw_lbl_folder,
+                           new_root, item_list, w_size, s_size)
             if w_size != 0:
                 new_root = osp.join(root_path, split, 'w0_s0')
-                convert_cohort(raw_img_folder, raw_lbl_folder, new_root, item_list, 0, 0)
+                convert_cohort(raw_img_folder, raw_lbl_folder,
+                               new_root, item_list, 0, 0)
+        elif split == 'val':
+            raw_img_folder = osp.join(raw_root, 'Tissue Images')
+            raw_lbl_folder = osp.join(raw_root, 'Annotations')
+            new_root = osp.join(root_path, split, 'w0_s0')
+            item_list = split_dict['val']
+            convert_cohort(raw_img_folder, raw_lbl_folder,
+                           new_root, item_list, 0, 0)
         else:
-            raw_img_folder = raw_root
-            raw_lbl_folder = raw_root
+            raw_img_folder = osp.join(raw_root, 'Tissue Images')
+            raw_lbl_folder = osp.join(raw_root, 'Annotations')
             new_root = osp.join(root_path, split, 'w0_s0')
 
-            item_list = [x.rstrip('.tif') for x in os.listdir(raw_img_folder) if '.tif' in x]
+            item_list = split_dict['test1'] + split_dict['test2']
 
-            convert_cohort(raw_img_folder, raw_lbl_folder, new_root, item_list, 0, 0)
+            convert_cohort(raw_img_folder, raw_lbl_folder,
+                           new_root, item_list, 0, 0)
 
     train_img_folder = osp.join(root_path, 'train', f'w{w_size}_s{s_size}')
     test_img_folder = osp.join(root_path, 'test', 'w0_s0')
 
     if total_split == 'official':
-        train_item_list = [x.rstrip('.tif') for x in os.listdir(train_img_folder) if '.tif' in x]
+        train_item_list = [x.rstrip('.tif') for x in os.listdir(
+            train_img_folder) if '.tif' in x]
         val_item_list = None
-        test_item_list = [x.rstrip('.tif') for x in os.listdir(test_img_folder) if '.tif' in x]
+        test_item_list = [x.rstrip('.tif') for x in os.listdir(
+            test_img_folder) if '.tif' in x]
     elif total_split == 'only-train_t16':
         item_list = split_dict['train'] + split_dict['val']
         train_item_list = []
         for item in item_list:
-            name_list = [x.rstrip('.tif') for x in os.listdir(train_img_folder)]
+            name_list = [x.rstrip('.tif')
+                         for x in os.listdir(train_img_folder)]
             for name in name_list:
                 if item in name and '_inst.npy' in name:
                     name = name.replace('_inst.npy', '')
@@ -295,7 +326,8 @@ def main():
         item_list = split_dict['train']
         train_item_list = []
         for item in item_list:
-            name_list = [x.rstrip('.tif') for x in os.listdir(train_img_folder)]
+            name_list = [x.rstrip('.tif')
+                         for x in os.listdir(train_img_folder)]
             for name in name_list:
                 if item in name and '_inst.npy' in name:
                     name = name.replace('_inst.npy', '')

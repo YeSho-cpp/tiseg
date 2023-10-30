@@ -18,6 +18,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='test (and eval) a model')
     parser.add_argument('config', help='test config file path')
     parser.add_argument('checkpoint', help='checkpoint file')
+    parser.add_argument('--save-pred', action='store_true', default=False, help='Whether to save prediction images.')
     parser.add_argument('--show', action='store_true', help='Whether to illustrate evaluation results.')
     parser.add_argument(
         '--show-folder', default='.nuclei_show', type=str, help='The storage folder of illustration results.')
@@ -34,7 +35,7 @@ def main():
     args = parse_args()
 
     cfg = mmcv.Config.fromfile(args.config)
-
+    cfg.save_pred=args.save_pred
     # set cudnn_benchmark
     if cfg.get('cudnn_benchmark', False):
         torch.backends.cudnn.benchmark = True
@@ -94,11 +95,11 @@ def main():
 
         if not distributed:
             model = MMDataParallel(model, device_ids=[0])
-            results = single_gpu_test(model, data_loader, pre_eval=True, pre_eval_args=eval_kwargs)
+            results = single_gpu_test(model, data_loader, cfg,pre_eval=True, pre_eval_args=eval_kwargs)
         else:
             model = MMDistributedDataParallel(
                 model.cuda(), device_ids=[torch.cuda.current_device()], broadcast_buffers=False)
-            results = multi_gpu_test(model, data_loader, pre_eval=True, pre_eval_args=eval_kwargs)
+            results = multi_gpu_test(model, data_loader,cfg,pre_eval=True, pre_eval_args=eval_kwargs)
 
         rank, _ = get_dist_info()
         if rank == 0:

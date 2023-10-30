@@ -77,12 +77,12 @@ data
 
 1. Download train cohort `"MoNuSeg 2018 Training Data.zip"` and test cohort `"MoNuSegTestData.zip"` from [this](https://monuseg.grand-challenge.org/Data/);
 2. Uncompress them into `data/monuseg/monuseg`;
-3. If you want to use our dataset split, run convertion script: `python tools/convert_dataset/monuseg.py data/monuseg only-train_t12_v4`;
-6. If you want to use fix-crop dataset, run convertion script:
+3. If you want to use our dataset split, run convertion script: `python tools/convert_dataset/monuseg.py data/monuseg only-train_t12_v4 -w 0 -s 0` ;
+4. If you want to use fix-crop dataset, run convertion script:
 
 ```python
-# only-train_t12_v4 (our split) crop_size = 300x300
-python tools/convert_dataset/monuseg.py data/monuseg only-train_t12_v4 -c 300
+# only-train_t12_v4 (our split)  window_size=512 step_size=256
+python tools/convert_dataset/monuseg.py data/monuseg only-train_t12_v4 -w 512 -s 256
 ```
 
 ## CPM17 Nuclei Segmentation Dataset

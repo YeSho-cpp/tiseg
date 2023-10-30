@@ -20,7 +20,7 @@ data/
 
 # Dataset symbolic link
 /data*
-
+work_dirs/
 # Vscode
 __vscode__
 

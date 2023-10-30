@@ -2,9 +2,34 @@ import mmcv
 import torch
 from mmcv.engine import collect_results_cpu, collect_results_gpu
 from mmcv.runner import get_dist_info
+import numpy as np
+import os
+import cv2
+from PIL import Image
+import random
 
 
-def single_gpu_test(model, data_loader, pre_eval=False, pre_eval_args={}):
+def create_folder(folder):
+    if not os.path.exists(folder):
+        os.mkdir(folder)
+
+
+def get_random_color():
+    ''' generate rgb using a list comprehension '''
+    r, g, b = [random.random()*255 for i in range(3)]
+    return r, g, b
+
+
+def save_view_eval_file(pred_labeled,save_view_dir,data):
+    pred_pred_label_name = '{}/{:s}_pred_label.png'.format(save_view_dir, data['metas']._data[0][0]['data_id'])
+    pred_colored = np.zeros(data['metas']._data[0][0]['ori_hw']+(3,))
+    pred_labeled_cnum = pred_labeled.max() + 1
+    for k in range(1, pred_labeled_cnum):
+        pred_colored[pred_labeled == k, :] = np.array(get_random_color())
+    cv2.imwrite(pred_pred_label_name, pred_colored)
+
+
+def single_gpu_test(model, data_loader,cfg=None,pre_eval=False, pre_eval_args={}):
     """Test with single GPU by progressive mode.
 
     Args:
@@ -25,11 +50,18 @@ def single_gpu_test(model, data_loader, pre_eval=False, pre_eval_args={}):
 
     prog_bar = mmcv.ProgressBar(len(dataset))
     loader_indices = data_loader.batch_sampler
-
+    if cfg!=None:
+        eval_dir=os.path.join(cfg.work_dir, 'eval')
+        if cfg.save_pred==True:
+            save_view_dir = os.path.join(eval_dir,"images")
+            create_folder(save_view_dir)
     for batch_indices, data in zip(loader_indices, data_loader):
         with torch.no_grad():
             result = model(**data)
-
+        
+        if cfg!=None and cfg.save_pred==True:
+            save_view_eval_file(result[0]['inst_pred'],save_view_dir,data)
+        
         if pre_eval:
             # TODO: adapt samples_per_gpu > 1.
             # only samples_per_gpu=1 valid now
@@ -44,7 +76,7 @@ def single_gpu_test(model, data_loader, pre_eval=False, pre_eval_args={}):
     return results
 
 
-def multi_gpu_test(model, data_loader, pre_eval=False, pre_eval_args={}):
+def multi_gpu_test(model, data_loader,cfg=None,pre_eval=False, pre_eval_args={}):
     """Test model with multiple gpus by progressive mode.
 
     Args:
@@ -74,7 +106,11 @@ def multi_gpu_test(model, data_loader, pre_eval=False, pre_eval_args={}):
     # batch_sampler based on DistributedSampler, the indices only point to data
     # samples of related machine.
     loader_indices = data_loader.batch_sampler
-
+    if cfg!=None:
+        eval_dir=os.path.join(cfg.work_dir, 'eval')
+        if cfg.save_pred==True:
+            save_view_dir = os.path.join(eval_dir,"images")
+            create_folder(save_view_dir)
     rank, world_size = get_dist_info()
     if rank == 0:
         prog_bar = mmcv.ProgressBar(len(dataset))
@@ -82,7 +118,10 @@ def multi_gpu_test(model, data_loader, pre_eval=False, pre_eval_args={}):
     for batch_indices, data in zip(loader_indices, data_loader):
         with torch.no_grad():
             result = model(return_loss=False, rescale=True, **data)
-
+        
+        if cfg!=None and cfg.save_pred==True:
+            save_view_eval_file(result[0]['inst_pred'],save_view_dir,data)
+        
         if pre_eval:
             # TODO: adapt samples_per_gpu > 1.
             # only samples_per_gpu=1 valid now

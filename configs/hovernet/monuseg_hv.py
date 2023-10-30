@@ -28,8 +28,8 @@ test_processes = [
 ]
 
 data = dict(
-    samples_per_gpu=16,
-    workers_per_gpu=16,
+    samples_per_gpu=8,
+    workers_per_gpu=8,
     train=dict(
         type=dataset_type,
         data_root=data_root,
@@ -40,15 +40,15 @@ data = dict(
     val=dict(
         type=dataset_type,
         data_root=data_root,
-        img_dir='train/w0_s0',
-        ann_dir='train/w0_s0',
-        split='only-train_t12_v4_test_w0_s0.txt',
+        img_dir='val/w0_s0',
+        ann_dir='val/w0_s0',
+        split='only-train_t12_v4_val_w0_s0.txt',
         processes=test_processes),
     test=dict(
         type=dataset_type,
         data_root=data_root,
-        img_dir='train/w0_s0',
-        ann_dir='train/w0_s0',
+        img_dir='test/w0_s0',
+        ann_dir='test/w0_s0',
         split='only-train_t12_v4_test_w0_s0.txt',
         processes=test_processes),
 )
