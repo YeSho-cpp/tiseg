@@ -15,3 +15,5 @@ scipy
 yapf
 tensorboard
 future
+albumentations
+yapf==0.40.1
