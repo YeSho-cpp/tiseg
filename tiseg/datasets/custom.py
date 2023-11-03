@@ -130,7 +130,7 @@ class CustomDataset(Dataset):
                  test_mode=False,
                  split=None):
 
-        self.mapper = DatasetMapper(test_mode, processes=processes)
+        self.mapper = DatasetMapper(test_mode, processes=processes) # 加载数据增强各类方法
 
         self.img_dir = img_dir
         self.ann_dir = ann_dir

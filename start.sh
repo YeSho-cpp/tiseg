@@ -6,4 +6,4 @@ python tools/train.py configs/unet/unet_vgg16_adam-lr1e-4_bs8_256x256_300e_monus
 
 # 测试命令
 
-python tools/test.py configs/cdnet/cdnet_vgg16_adam-lr5e-4_bs16_256x256_300e_monuseg.py work_dirs/cdnet/cdnet_vgg16_adam-lr5e-4_bs16_256x256_300e_monuseg/best_mAji_epoch_160.pth
+python tools/test.py configs/cdnet/cdnet_vgg16_radam-lr5e-4_bs16_300x300_300e_cpm17.py work_dirs/cdnet/cdnet_vgg16_radam-lr5e-4_bs16_300x300_300e_cpm17/best_mAji_epoch_300.pth --save-pred
