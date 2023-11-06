@@ -115,7 +115,7 @@ python tools/convert_dataset/monuseg.py data/monuseg only-train_t12_v4 -w 512 -s
 3. Uncompressed `OSCD.zip` into `data/oscd`
 4. Run conversion script: `python tools/convert_dataset/oscd.py data/oscd --nproc 8`;
 
-# CONIC Nuclei Segmentation Dataset
+## CONIC Nuclei Segmentation Dataset
 
 1. Download CONIC from [homepage](https://drive.google.com/drive/folders/1il9jG7uA4-ebQ_lNmXbbF2eOK9uNwheb)
 2. put CoNIC Challenge Train into `data/conic`
