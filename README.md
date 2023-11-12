@@ -43,7 +43,7 @@ python tools/train.py configs/unet/unet_vgg16_adam-lr1e-4_bs8_256x256_300e_monus
 # 用cdnet训练cpm17
 python tools/train.py configs/cdnet/cdnet_vgg16_radam-lr5e-4_bs16_300x300_300e_cpm17.py 
 # 用 4gpu unet训练monuseg
-python tools/train.py configs/unet/unet_vgg16_adam-lr1e-4_bs8_256x256_300e_monuseg.py 4
+python bash tools/dist_train.sh unet_vgg16_adam-lr1e-4_bs8_256x256_300e_monuseg.py 4
 ```
 
 # Evaluation
